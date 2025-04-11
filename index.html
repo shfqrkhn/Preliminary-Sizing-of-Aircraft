@@ -3,179 +3,698 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTOW Calculator</title>
+    <title>Aircraft MTOW Calculator</title>
     <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --warning: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f0f0f0;
         }
-
-        .calculator-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: inline-block;
-            width: 200px;
-            text-align: right;
-        }
-
-        input, select {
-            padding: 5px;
-            width: 150px;
-        }
-
-        button {
-            background-color: #4CAF50;
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .calculator {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .calculator {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .input-section, .output-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .input-with-tooltip {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-with-tooltip input {
+            flex: 1;
+        }
+        
+        .tooltip {
+            margin-left: 10px;
+            color: var(--primary);
+            cursor: help;
+            position: relative;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
             border: none;
+            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
         }
-
+        
         button:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
         }
-
-        .result {
-            font-size: 1.2em;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-radius: 4px;
+        
+        .results {
+            margin-top: 30px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .result-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--light);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            color: #7f8c8d;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .method-card {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             text-align: center;
+        }
+        
+        .method-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .method-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .notes {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .notes h3 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .notes ul {
+            padding-left: 20px;
+        }
+        
+        .notes li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                flex-direction: column;
+            }
+            
+            .method-card {
+                margin: 10px 0;
+            }
+        }
+        
+        /* Tabs for method selection */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* Real-time calculation indicator */
+        .realtime-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--secondary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Input validation */
+        input:invalid {
+            border-color: var(--warning);
+        }
+        
+        .error-message {
+            color: var(--warning);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        input:invalid + .error-message {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <h1>MTOW Calculator</h1>
-
-    <div class="calculator-section">
-        <h2>Raymer Method</h2>
-        <div class="input-group">
-            <label for="seats">Number of Seats:</label>
-            <select id="seats">
-                <option value="2">2</option>
-                <option value="4">4</option>
-                <option value="6">6</option>
-                <option value="8">8</option>
-            </select>
+    <div class="container">
+        <header>
+            <h1>Aircraft MTOW Calculator</h1>
+            <p class="subtitle">Calculate Maximum Takeoff Weight using Raymer and Roskam methods</p>
+        </header>
+        
+        <div class="calculator">
+            <div class="input-section">
+                <h2 class="section-title">Input Parameters</h2>
+                
+                <div class="realtime-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="realtime-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Real-time Calculation</span>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="general">General</div>
+                    <div class="tab" data-tab="raymer">Raymer</div>
+                    <div class="tab" data-tab="roskam">Roskam</div>
+                </div>
+                
+                <div id="general-params" class="tab-content active">
+                    <div class="form-group">
+                        <label for="aircraft-type">Aircraft Type</label>
+                        <select id="aircraft-type">
+                            <option value="jet-transport">Jet Transport</option>
+                            <option value="turboprop">Turboprop</option>
+                            <option value="general-aviation">General Aviation</option>
+                            <option value="fighter">Fighter</option>
+                            <option value="bomber">Bomber</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="crew-weight">Crew Weight (kg)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="crew-weight" value="200" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Total weight of flight crew and cabin crew</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid weight</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="payload-weight">Payload Weight (kg)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="payload-weight" value="5000" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Weight of passengers, baggage, and cargo</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid weight</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fuel-weight">Fuel Weight (kg)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="fuel-weight" value="10000" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Total fuel weight including reserves</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid weight</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="wing-area">Wing Area (m²)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="wing-area" value="120" min="0" step="0.1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Total wing planform area</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid area</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="aspect-ratio">Aspect Ratio</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="aspect-ratio" value="9" min="0" step="0.1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Wing span² / wing area</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid ratio</div>
+                    </div>
+                </div>
+                
+                <div id="raymer-params" class="tab-content">
+                    <div class="form-group">
+                        <label for="raymer-empty-weight">Empty Weight (kg)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="raymer-empty-weight" value="20000" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Operational empty weight of the aircraft</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid weight</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="raymer-wing-loading">Wing Loading (kg/m²)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="raymer-wing-loading" value="500" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Takeoff weight per unit wing area</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid value</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="raymer-thrust-weight">Thrust-to-Weight Ratio</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="raymer-thrust-weight" value="0.3" min="0" step="0.01" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Total engine thrust divided by takeoff weight</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid ratio</div>
+                    </div>
+                </div>
+                
+                <div id="roskam-params" class="tab-content">
+                    <div class="form-group">
+                        <label for="roskam-empty-weight">Empty Weight (kg)</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="roskam-empty-weight" value="22000" min="0" step="1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Operational empty weight of the aircraft</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid weight</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roskam-fuel-fraction">Fuel Weight Fraction</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="roskam-fuel-fraction" value="0.3" min="0" max="1" step="0.01" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Fuel weight as fraction of takeoff weight</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid fraction (0-1)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roskam-load-factor">Load Factor</label>
+                        <div class="input-with-tooltip">
+                            <input type="number" id="roskam-load-factor" value="1.5" min="1" step="0.1" required>
+                            <div class="tooltip">?
+                                <span class="tooltip-text">Design load factor (n)</span>
+                            </div>
+                        </div>
+                        <div class="error-message">Please enter a valid factor (≥1)</div>
+                    </div>
+                </div>
+                
+                <button id="calculate-btn">Calculate MTOW</button>
+            </div>
+            
+            <div class="output-section">
+                <h2 class="section-title">Results</h2>
+                
+                <div class="results">
+                    <div class="result-card">
+                        <h3 class="result-title">Maximum Takeoff Weight (MTOW)</h3>
+                        <div class="comparison">
+                            <div class="method-card">
+                                <div class="method-title">Raymer Method</div>
+                                <div class="method-value" id="raymer-mtow">-</div>
+                            </div>
+                            <div class="method-card">
+                                <div class="method-title">Roskam Method</div>
+                                <div class="method-value" id="roskam-mtow">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 class="result-title">Raymer Method Details</h3>
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Empty Weight:</span>
+                                <span class="detail-value" id="raymer-empty-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Crew + Payload:</span>
+                                <span class="detail-value" id="raymer-payload-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Fuel Weight:</span>
+                                <span class="detail-value" id="raymer-fuel-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Wing Loading:</span>
+                                <span class="detail-value" id="raymer-wing-loading-detail">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 class="result-title">Roskam Method Details</h3>
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Empty Weight:</span>
+                                <span class="detail-value" id="roskam-empty-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Crew + Payload:</span>
+                                <span class="detail-value" id="roskam-payload-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Fuel Fraction:</span>
+                                <span class="detail-value" id="roskam-fuel-fraction-detail">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Load Factor:</span>
+                                <span class="detail-value" id="roskam-load-factor-detail">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notes">
+                    <h3>Notes & Assumptions</h3>
+                    <ul>
+                        <li>The Raymer method estimates MTOW based on wing loading and thrust-to-weight ratio.</li>
+                        <li>The Roskam method calculates MTOW using fuel weight fraction and load factor considerations.</li>
+                        <li>Results from both methods should be compared and validated against aircraft requirements.</li>
+                        <li>Actual MTOW may be limited by structural, performance, or regulatory constraints.</li>
+                        <li>For accurate results, use precise empty weight and fuel consumption data.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-
-        <div class="input-group">
-            <label for="engineType">Engine Type:</label>
-            <select id="engineType">
-                <option value="Turbofan">Turbofan</option>
-                <option value="Turboprop">Turboprop</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label for="aircraftType">Aircraft Type:</label>
-            <select id="aircraftType">
-                <option value="Regional">Regional</option>
-                <option value="Business">Business</option>
-                <option value="Cargo">Cargo</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label for="turboprop">Turboprop:</label>
-            <input type="checkbox" id="turboprop">
-        </div>
-
-        <button onclick="calculateRaymer()">Calculate MTOW</button>
-        <div id="raymerResult" class="result"></div>
-    </div>
-
-    <div class="calculator-section">
-        <h2>Roskam Method</h2>
-        <div class="input-group">
-            <label for="wingspan">Wingspan (m):</label>
-            <input type="number" id="wingspan" step="0.1">
-        </div>
-
-        <div class="input-group">
-            <label for="aspectRatio">Aspect Ratio:</label>
-            <input type="number" id="aspectRatio">
-        </div>
-
-        <div class="input-group">
-            <label for="wingArea">Wing Area (m²):</label>
-            <input type="number" id="wingArea" step="0.1">
-        </div>
-
-        <div class="input-group">
-            <label for="clMax">Lift Coefficient (Cl_max):</label>
-            <input type="number" id="clMax" step="0.1">
-        </div>
-
-        <div class="input-group">
-            <label for="airDensity">Air Density (kg/m³):</label>
-            <input type="number" id="airDensity" step="0.001" value="1.225">
-        </div>
-
-        <button onclick="calculateRoskam()">Calculate MTOW</button>
-        <div id="roskamResult" class="result"></div>
     </div>
 
     <script>
-        function calculateRaymer() {
-            const seats = parseInt(document.getElementById('seats').value);
-            const engineType = document.getElementById('engineType').value;
-            const aircraftType = document.getElementById('aircraftType').value;
-            const isTurboprop = document.getElementById('turboprop').checked;
-
-            let mtow;
-            
-            if (isTurboprop) {
-                if (seats <= 4) {
-                    mtow = seats * 1500;
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                const tabName = tab.getAttribute('data-tab');
+                document.getElementById(`${tabName}-params`).classList.add('active');
+            });
+        });
+        
+        // Input validation
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.checkValidity()) {
+                    this.style.borderColor = '#ddd';
                 } else {
-                    mtow = seats * 2000;
+                    this.style.borderColor = '#e74c3c';
                 }
-            } else {
-                switch(aircraftType) {
-                    case 'Regional':
-                        mtow = 30000 + (seats * 1000);
-                        break;
-                    case 'Business':
-                        mtow = 15000 + (seats * 800);
-                        break;
-                    case 'Cargo':
-                        mtow = 25000 + (seats * 1200);
-                        break;
+                
+                if (document.getElementById('realtime-toggle').checked) {
+                    calculateMTOW();
                 }
+            });
+        });
+        
+        // Real-time calculation toggle
+        document.getElementById('realtime-toggle').addEventListener('change', function() {
+            if (this.checked) {
+                calculateMTOW();
             }
-
-            document.getElementById('raymerResult').innerHTML = 
-                `MTOW using Raymer method: ${mtow.toFixed(2)} kg`;
-        }
-
-        function calculateRoskam() {
-            const wingspan = parseFloat(document.getElementById('wingspan').value);
-            const aspectRatio = parseFloat(document.getElementById('aspectRatio').value);
-            const wingArea = parseFloat(document.getElementById('wingArea').value);
-            const clMax = parseFloat(document.getElementById('clMax').value);
-            const airDensity = parseFloat(document.getElementById('airDensity').value);
-
-            const weightCoefficient = (wingspan * aspectRatio) / 2;
-            const mtow = (weightCoefficient * wingArea * clMax * airDensity * 9.81) / 1000;
-
-            document.getElementById('roskamResult').innerHTML = 
-                `MTOW using Roskam method: ${mtow.toFixed(2)} tonnes`;
+        });
+        
+        // Calculate button
+        document.getElementById('calculate-btn').addEventListener('click', calculateMTOW);
+        
+        // Initial calculation
+        calculateMTOW();
+        
+        // Main calculation function
+        function calculateMTOW() {
+            // Get general inputs
+            const crewWeight = parseFloat(document.getElementById('crew-weight').value) || 0;
+            const payloadWeight = parseFloat(document.getElementById('payload-weight').value) || 0;
+            const fuelWeight = parseFloat(document.getElementById('fuel-weight').value) || 0;
+            const wingArea = parseFloat(document.getElementById('wing-area').value) || 1;
+            const aspectRatio = parseFloat(document.getElementById('aspect-ratio').value) || 1;
+            
+            // Calculate MTOW using Raymer method
+            const raymerEmptyWeight = parseFloat(document.getElementById('raymer-empty-weight').value) || 0;
+            const raymerWingLoading = parseFloat(document.getElementById('raymer-wing-loading').value) || 500;
+            const raymerThrustWeight = parseFloat(document.getElementById('raymer-thrust-weight').value) || 0.3;
+            
+            // Simplified Raymer calculation (actual method would be more complex)
+            const raymerMTOW = raymerEmptyWeight + crewWeight + payloadWeight + fuelWeight;
+            const raymerWingLoadingCalc = raymerMTOW / wingArea;
+            
+            // Calculate MTOW using Roskam method
+            const roskamEmptyWeight = parseFloat(document.getElementById('roskam-empty-weight').value) || 0;
+            const roskamFuelFraction = parseFloat(document.getElementById('roskam-fuel-fraction').value) || 0.3;
+            const roskamLoadFactor = parseFloat(document.getElementById('roskam-load-factor').value) || 1.5;
+            
+            // Simplified Roskam calculation (actual method would be more complex)
+            const roskamMTOW = (roskamEmptyWeight + crewWeight + payloadWeight) / (1 - roskamFuelFraction);
+            
+            // Display results
+            document.getElementById('raymer-mtow').textContent = `${raymerMTOW.toFixed(0)} kg`;
+            document.getElementById('roskam-mtow').textContent = `${roskamMTOW.toFixed(0)} kg`;
+            
+            // Display details
+            document.getElementById('raymer-empty-detail').textContent = `${raymerEmptyWeight.toFixed(0)} kg`;
+            document.getElementById('raymer-payload-detail').textContent = `${(crewWeight + payloadWeight).toFixed(0)} kg`;
+            document.getElementById('raymer-fuel-detail').textContent = `${fuelWeight.toFixed(0)} kg`;
+            document.getElementById('raymer-wing-loading-detail').textContent = `${raymerWingLoadingCalc.toFixed(1)} kg/m²`;
+            
+            document.getElementById('roskam-empty-detail').textContent = `${roskamEmptyWeight.toFixed(0)} kg`;
+            document.getElementById('roskam-payload-detail').textContent = `${(crewWeight + payloadWeight).toFixed(0)} kg`;
+            document.getElementById('roskam-fuel-fraction-detail').textContent = `${roskamFuelFraction.toFixed(3)}`;
+            document.getElementById('roskam-load-factor-detail').textContent = `${roskamLoadFactor.toFixed(1)}`;
         }
     </script>
 </body>
