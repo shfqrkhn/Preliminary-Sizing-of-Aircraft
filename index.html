@@ -1,86 +1,182 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Simplified MTOW Calculator (Based on Roskam Principles)</title>
-<style>
-  body {
-    font-family: sans-serif;
-  }
-  .container {
-    width: 300px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-  }
-  button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  #result {
-    margin-top: 15px;
-    font-weight: bold;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTOW Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .calculator-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: inline-block;
+            width: 200px;
+            text-align: right;
+        }
+
+        input, select {
+            padding: 5px;
+            width: 150px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            font-size: 1.2em;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Simplified MTOW Calculator</h2>
-    <p>This is a highly simplified calculator based on the general principles discussed in Roskam's "Airplane Design". It does not implement the full complexity of his methods.</p>
+    <h1>MTOW Calculator</h1>
 
-    <label for="payload">Design Payload Weight (kg):</label>
-    <input type="number" id="payload" value="1000">
+    <div class="calculator-section">
+        <h2>Raymer Method</h2>
+        <div class="input-group">
+            <label for="seats">Number of Seats:</label>
+            <select id="seats">
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="8">8</option>
+            </select>
+        </div>
 
-    <label for="crew">Crew Weight (kg):</label>
-    <input type="number" id="crew" value="150">
+        <div class="input-group">
+            <label for="engineType">Engine Type:</label>
+            <select id="engineType">
+                <option value="Turbofan">Turbofan</option>
+                <option value="Turboprop">Turboprop</option>
+            </select>
+        </div>
 
-    <label for="fuel">Estimated Fuel Weight (kg):</label>
-    <input type="number" id="fuel" value="500">
+        <div class="input-group">
+            <label for="aircraftType">Aircraft Type:</label>
+            <select id="aircraftType">
+                <option value="Regional">Regional</option>
+                <option value="Business">Business</option>
+                <option value="Cargo">Cargo</option>
+            </select>
+        </div>
 
-    <label for="emptyWeightRatio">Estimated Empty Weight Ratio (e.g., 0.5 for 50%):</label>
-    <input type="number" id="emptyWeightRatio" value="0.6" step="0.01">
+        <div class="input-group">
+            <label for="turboprop">Turboprop:</label>
+            <input type="checkbox" id="turboprop">
+        </div>
 
-    <button onclick="calculateMTOW()">Calculate MTOW</button>
+        <button onclick="calculateRaymer()">Calculate MTOW</button>
+        <div id="raymerResult" class="result"></div>
+    </div>
 
-    <div id="result"></div>
-  </div>
+    <div class="calculator-section">
+        <h2>Roskam Method</h2>
+        <div class="input-group">
+            <label for="wingspan">Wingspan (m):</label>
+            <input type="number" id="wingspan" step="0.1">
+        </div>
 
-  <script>
-    function calculateMTOW() {
-      const payload = parseFloat(document.getElementById("payload").value);
-      const crew = parseFloat(document.getElementById("crew").value);
-      const fuel = parseFloat(document.getElementById("fuel").value);
-      const emptyWeightRatio = parseFloat(document.getElementById("emptyWeightRatio").value);
+        <div class="input-group">
+            <label for="aspectRatio">Aspect Ratio:</label>
+            <input type="number" id="aspectRatio">
+        </div>
 
-      // Very simplified approach: Assume MTOW = Empty Weight + Payload + Crew + Fuel
-      // And Empty Weight = Empty Weight Ratio * MTOW
-      // So, MTOW = (Empty Weight Ratio * MTOW) + Payload + Crew + Fuel
-      // Rearranging: MTOW - (Empty Weight Ratio * MTOW) = Payload + Crew + Fuel
-      // MTOW * (1 - Empty Weight Ratio) = Payload + Crew + Fuel
-      // MTOW = (Payload + Crew + Fuel) / (1 - Empty Weight Ratio)
+        <div class="input-group">
+            <label for="wingArea">Wing Area (m²):</label>
+            <input type="number" id="wingArea" step="0.1">
+        </div>
 
-      if (emptyWeightRatio >= 1 || emptyWeightRatio <= 0) {
-        document.getElementById("result").innerText = "Error: Empty Weight Ratio must be between 0 and 1.";
-        return;
-      }
+        <div class="input-group">
+            <label for="clMax">Lift Coefficient (Cl_max):</label>
+            <input type="number" id="clMax" step="0.1">
+        </div>
 
-      const mtow = (payload + crew + fuel) / (1 - emptyWeightRatio);
-      document.getElementById("result").innerText = "Estimated MTOW: " + mtow.toFixed(2) + " kg";
-    }
-  </script>
+        <div class="input-group">
+            <label for="airDensity">Air Density (kg/m³):</label>
+            <input type="number" id="airDensity" step="0.001" value="1.225">
+        </div>
+
+        <button onclick="calculateRoskam()">Calculate MTOW</button>
+        <div id="roskamResult" class="result"></div>
+    </div>
+
+    <script>
+        function calculateRaymer() {
+            const seats = parseInt(document.getElementById('seats').value);
+            const engineType = document.getElementById('engineType').value;
+            const aircraftType = document.getElementById('aircraftType').value;
+            const isTurboprop = document.getElementById('turboprop').checked;
+
+            let mtow;
+            
+            if (isTurboprop) {
+                if (seats <= 4) {
+                    mtow = seats * 1500;
+                } else {
+                    mtow = seats * 2000;
+                }
+            } else {
+                switch(aircraftType) {
+                    case 'Regional':
+                        mtow = 30000 + (seats * 1000);
+                        break;
+                    case 'Business':
+                        mtow = 15000 + (seats * 800);
+                        break;
+                    case 'Cargo':
+                        mtow = 25000 + (seats * 1200);
+                        break;
+                }
+            }
+
+            document.getElementById('raymerResult').innerHTML = 
+                `MTOW using Raymer method: ${mtow.toFixed(2)} kg`;
+        }
+
+        function calculateRoskam() {
+            const wingspan = parseFloat(document.getElementById('wingspan').value);
+            const aspectRatio = parseFloat(document.getElementById('aspectRatio').value);
+            const wingArea = parseFloat(document.getElementById('wingArea').value);
+            const clMax = parseFloat(document.getElementById('clMax').value);
+            const airDensity = parseFloat(document.getElementById('airDensity').value);
+
+            const weightCoefficient = (wingspan * aspectRatio) / 2;
+            const mtow = (weightCoefficient * wingArea * clMax * airDensity * 9.81) / 1000;
+
+            document.getElementById('roskamResult').innerHTML = 
+                `MTOW using Roskam method: ${mtow.toFixed(2)} tonnes`;
+        }
+    </script>
 </body>
 </html>
