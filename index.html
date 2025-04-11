@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML5 Graphing Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        #display {
+            grid-column: 1 / -1;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            text-align: right;
+            background-color: #eee;
+            font-size: 1.2em;
+        }
+        #graphCanvas {
+            border: 1px solid black;
+        }
+        .button {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #fff;
+        }
+        .button:hover {
+            background-color: #eee;
+        }
+        .operator {
+            background-color: #f0ad4e;
+            color: white;
+        }
+        .equals {
+            grid-column: span 2;
+            background-color: #5cb85c;
+            color: white;
+        }
+        #graph-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        #graph-controls label {
+            display: flex;
+            align-items: center;
+        }
+        #graph-controls input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML5 Graphing Calculator</h1>
+    <div id="calculator">
+        <div id="display">0</div>
+        <button class="button">7</button>
+        <button class="button">8</button>
+        <button class="button">9</button>
+        <button class="button operator">/</button>
+        <button class="button">4</button>
+        <button class="button">5</button>
+        <button class="button">6</button>
+        <button class="button operator">*</button>
+        <button class="button">1</button>
+        <button class="button">2</button>
+        <button class="button">3</button>
+        <button class="button operator">-</button>
+        <button class="button">0</button>
+        <button class="button">.</button>
+        <button class="button equals">=</button>
+        <button class="button operator">+</button>
+        <button class="button">sin</button>
+        <button class="button">cos</button>
+        <button class="button">tan</button>
+        <button class="button">log</button>
+        <button class="button">sqrt</button>
+        <button class="button">(</button>
+        <button class="button">)</button>
+        <button class="button">^</button>
+        <button class="button">x</button>
+        <button class="button">AC</button>
+    </div>
+
+    <div>
+        <label for="functionInput">Function (use 'x' as the variable):</label>
+        <input type="text" id="functionInput" value="x^2">
+        <button onclick="drawGraph()">Graph</button>
+    </div>
+
+    <div id="graph-controls">
+        <label for="xMin">X Min:</label>
+        <input type="number" id="xMin" value="-10">
+        <label for="xMax">X Max:</label>
+        <input type="number" id="xMax" value="10">
+        <label for="yMin">Y Min:</label>
+        <input type="number" id="yMin" value="-10">
+        <label for="yMax">Y Max:</label>
+        <input type="number" id="yMax" value="10">
+        <label for="scale">Scale:</label>
+        <input type="number" id="scale" value="20">
+    </div>
+
+    <canvas id="graphCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('.button');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const ctx = graphCanvas.getContext('2d');
+        const functionInput = document.getElementById('functionInput');
+        const xMinInput = document.getElementById('xMin');
+        const xMaxInput = document.getElementById('xMax');
+        const yMinInput = document.getElementById('yMin');
+        const yMaxInput = document.getElementById('yMax');
+        const scaleInput = document.getElementById('scale');
+
+        let currentInput = '';
+        let result = null;
+        let operator = null;
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const value = button.textContent;
+                if (/\d|\./.test(value)) {
+                    currentInput += value;
+                    display.textContent = currentInput;
+                } else if (['+', '-', '*', '/'].includes(value)) {
+                    if (currentInput !== '') {
+                        if (result === null) {
+                            result = parseFloat(currentInput);
+                        } else {
+                            calculate();
+                        }
+                        operator = value;
+                        currentInput = '';
+                    }
+                } else if (value === '=') {
+                    if (operator !== null && currentInput !== '') {
+                        calculate();
+                        display.textContent = result;
+                        currentInput = result.toString();
+                        result = null;
+                        operator = null;
+                    }
+                } else if (value === 'AC') {
+                    currentInput = '';
+                    result = null;
+                    operator = null;
+                    display.textContent = '0';
+                } else if (['sin', 'cos', 'tan', 'log', 'sqrt', '^', '(', ')'].includes(value)) {
+                    currentInput += value + (value === '(' ? '' : (value === ')' ? '' : (value === '^' ? '' : '(')));
+                    display.textContent = currentInput;
+                } else if (value === 'x') {
+                    currentInput += 'x';
+                    display.textContent = currentInput;
+                }
+            });
+        });
+
+        function calculate() {
+            const num2 = parseFloat(currentInput);
+            if (operator === '+') {
+                result += num2;
+            } else if (operator === '-') {
+                result -= num2;
+            } else if (operator === '*') {
+                result *= num2;
+            } else if (operator === '/') {
+                if (num2 === 0) {
+                    display.textContent = 'Error: Division by zero';
+                    currentInput = '';
+                    result = null;
+                    operator = null;
+                    return;
+                }
+                result /= num2;
+            }
+        }
+
+        function drawGraph() {
+            const funcStr = functionInput.value;
+            const xMin = parseFloat(xMinInput.value);
+            const xMax = parseFloat(xMaxInput.value);
+            const yMin = parseFloat(yMinInput.value);
+            const yMax = parseFloat(yMaxInput.value);
+            const scale = parseFloat(scaleInput.value);
+
+            const width = graphCanvas.width;
+            const height = graphCanvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.strokeStyle = 'gray';
+            ctx.lineWidth = 1;
+
+            // Y-axis
+            const yAxisX = Math.round(width / 2);
+            ctx.moveTo(yAxisX, 0);
+            ctx.lineTo(yAxisX, height);
+
+            // X-axis
+            const xAxisY = Math.round(height / 2);
+            ctx.moveTo(0, xAxisY);
+            ctx.lineTo(width, xAxisY);
+
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+
+            let firstPoint = true;
+            for (let i = 0; i <= width; i++) {
+                const xValue = xMin + (xMax - xMin) * i / width;
+                try {
+                    // Replace 'x' with the current xValue and evaluate
+                    const expression = funcStr.replace(/x/g, `(${xValue})`);
+                    const yValue = eval(expression);
+
+                    // Convert yValue to canvas coordinates
+                    const canvasX = i;
+                    const canvasY = height / 2 - (yValue * scale);
+
+                    if (canvasY >= 0 && canvasY <= height) {
+                        if (firstPoint) {
+                            ctx.moveTo(canvasX, canvasY);
+                            firstPoint = false;
+                        } else {
+                            ctx.lineTo(canvasX, canvasY);
+                        }
+                    } else {
+                        firstPoint = true; // Discontinue line if out of bounds
+                    }
+                } catch (error) {
+                    console.error("Error evaluating function:", error);
+                    firstPoint = true; // Reset path on error
+                }
+            }
+            ctx.stroke();
+        }
+
+        // Initial graph draw
+        drawGraph();
+    </script>
+</body>
+</html>
