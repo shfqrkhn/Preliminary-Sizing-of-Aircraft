@@ -1,6 +1,25 @@
-See the new online variant here: https://shfqrkhn.github.io/Preliminary-Sizing-of-Aircraft/
+# AI Generated Application
 
-# Preliminary-Sizing-of-Aircraft
-Based on Roskam and Raymer's textbooks
+Version: 1.0.0
 
-I used my prior C++ knowledge to create a Java program with a simple GUI using Netbeans IDE. It performed preliminary sizing for the SAR Aircraft for my NCADE Capstone 2016-2017 project. The whole project took me only 40 manhours, which included going through the relevant theories in Roskam & Raymer textbooks, Java tutorials, familiarization with the IDE environment, and the actual coding.
+Last Updated: 2023-10-27
+
+## Description
+
+This is a template for the README file. Please replace the placeholders with your application's details.
+
+## Installation
+
+[Instructions on how to install the application]
+
+## Usage
+
+[Instructions on how to use the application]
+
+## Contributing
+
+[Guidelines for contributing to the project]
+
+## License
+
+[License information]
