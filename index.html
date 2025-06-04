@@ -24,6 +24,19 @@
             background-color: #f5f7fa;
             color: var(--dark);
             line-height: 1.6;
+            margin: 40px; /* Default margin */
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin: 20px; /* Reduced margin for smaller screens */
+            }
+            h1 {
+                font-size: 2rem; /* Slightly reduce h1 size */
+            }
+            .subtitle {
+                font-size: 1rem; /* Slightly reduce subtitle size */
+            }
         }
         
         .container {
@@ -107,7 +120,7 @@
             position: relative;
         }
         
-        .tooltip-text {
+        .tooltip-text { /* Base style for tooltip text */
             visibility: hidden;
             width: 200px;
             background-color: var(--dark);
@@ -121,12 +134,12 @@
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, visibility 0.3s; /* Ensure visibility is transitioned */
             font-size: 0.9rem;
             font-weight: normal;
         }
-        
-        .tooltip:hover .tooltip-text {
+
+        .tooltip .tooltip-text.visible { /* Class added by JS to show tooltip */
             visibility: visible;
             opacity: 1;
         }
@@ -368,15 +381,15 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <main class="container">
         <header>
             <h1>Aircraft MTOW Calculator</h1>
             <p class="subtitle">Calculate Maximum Takeoff Weight using Raymer and Roskam methods</p>
         </header>
         
         <div class="calculator">
-            <div class="input-section">
-                <h2 class="section-title">Input Parameters</h2>
+            <section class="input-section" aria-labelledby="input-section-title">
+                <h2 class="section-title" id="input-section-title">Input Parameters</h2>
                 
                 <div class="realtime-toggle">
                     <label class="switch">
@@ -386,13 +399,15 @@
                     <span>Real-time Calculation</span>
                 </div>
                 
-                <div class="tabs">
-                    <div class="tab active" data-tab="general">General</div>
-                    <div class="tab" data-tab="raymer">Raymer</div>
-                    <div class="tab" data-tab="roskam">Roskam</div>
-                </div>
+                <nav aria-label="Parameter Tabs">
+                    <div class="tabs" role="tablist">
+                        <div class="tab active" data-tab="general" role="tab" id="tab-general" aria-selected="true">General</div>
+                        <div class="tab" data-tab="raymer" role="tab" id="tab-raymer" aria-selected="false">Raymer</div>
+                        <div class="tab" data-tab="roskam" role="tab" id="tab-roskam" aria-selected="false">Roskam</div>
+                    </div>
+                </nav>
                 
-                <div id="general-params" class="tab-content active">
+                <div id="general-params" class="tab-content active" role="tabpanel" aria-labelledby="tab-general">
                     <div class="form-group">
                         <label for="aircraft-type">Aircraft Type</label>
                         <select id="aircraft-type">
@@ -407,134 +422,134 @@
                     <div class="form-group">
                         <label for="crew-weight">Crew Weight (kg)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="crew-weight" value="200" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Total weight of flight crew and cabin crew</span>
+                            <input type="number" id="crew-weight" value="200" min="0" step="1" required aria-describedby="crew-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-crew-weight">?
+                                <span class="tooltip-text" id="tooltip-crew-weight" role="tooltip" aria-hidden="true">Total weight of flight crew and cabin crew</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid weight</div>
+                        <div class="error-message" id="crew-weight-error" role="alert">Please enter a valid weight</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="payload-weight">Payload Weight (kg)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="payload-weight" value="5000" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Weight of passengers, baggage, and cargo</span>
+                            <input type="number" id="payload-weight" value="5000" min="0" step="1" required aria-describedby="payload-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-payload-weight">?
+                                <span class="tooltip-text" id="tooltip-payload-weight" role="tooltip" aria-hidden="true">Weight of passengers, baggage, and cargo</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid weight</div>
+                        <div class="error-message" id="payload-weight-error" role="alert">Please enter a valid weight</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="fuel-weight">Fuel Weight (kg)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="fuel-weight" value="10000" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Total fuel weight including reserves</span>
+                            <input type="number" id="fuel-weight" value="10000" min="0" step="1" required aria-describedby="fuel-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-fuel-weight">?
+                                <span class="tooltip-text" id="tooltip-fuel-weight" role="tooltip" aria-hidden="true">Total fuel weight including reserves</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid weight</div>
+                        <div class="error-message" id="fuel-weight-error" role="alert">Please enter a valid weight</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="wing-area">Wing Area (m²)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="wing-area" value="120" min="0" step="0.1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Total wing planform area</span>
+                            <input type="number" id="wing-area" value="120" min="0" step="0.1" required aria-describedby="wing-area-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-wing-area">?
+                                <span class="tooltip-text" id="tooltip-wing-area" role="tooltip" aria-hidden="true">Total wing planform area</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid area</div>
+                        <div class="error-message" id="wing-area-error" role="alert">Please enter a valid area</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="aspect-ratio">Aspect Ratio</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="aspect-ratio" value="9" min="0" step="0.1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Wing span² / wing area</span>
+                            <input type="number" id="aspect-ratio" value="9" min="0" step="0.1" required aria-describedby="aspect-ratio-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-aspect-ratio">?
+                                <span class="tooltip-text" id="tooltip-aspect-ratio" role="tooltip" aria-hidden="true">Wing span² / wing area</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid ratio</div>
+                        <div class="error-message" id="aspect-ratio-error" role="alert">Please enter a valid ratio</div>
                     </div>
                 </div>
                 
-                <div id="raymer-params" class="tab-content">
+                <div id="raymer-params" class="tab-content" role="tabpanel" aria-labelledby="tab-raymer">
                     <div class="form-group">
                         <label for="raymer-empty-weight">Empty Weight (kg)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="raymer-empty-weight" value="20000" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Operational empty weight of the aircraft</span>
+                            <input type="number" id="raymer-empty-weight" value="20000" min="0" step="1" required aria-describedby="raymer-empty-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-raymer-empty-weight">?
+                                <span class="tooltip-text" id="tooltip-raymer-empty-weight" role="tooltip" aria-hidden="true">Operational empty weight of the aircraft</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid weight</div>
+                        <div class="error-message" id="raymer-empty-weight-error" role="alert">Please enter a valid weight</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="raymer-wing-loading">Wing Loading (kg/m²)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="raymer-wing-loading" value="500" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Takeoff weight per unit wing area</span>
+                            <input type="number" id="raymer-wing-loading" value="500" min="0" step="1" required aria-describedby="raymer-wing-loading-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-raymer-wing-loading">?
+                                <span class="tooltip-text" id="tooltip-raymer-wing-loading" role="tooltip" aria-hidden="true">Takeoff weight per unit wing area</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid value</div>
+                        <div class="error-message" id="raymer-wing-loading-error" role="alert">Please enter a valid value</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="raymer-thrust-weight">Thrust-to-Weight Ratio</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="raymer-thrust-weight" value="0.3" min="0" step="0.01" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Total engine thrust divided by takeoff weight</span>
+                            <input type="number" id="raymer-thrust-weight" value="0.3" min="0" step="0.01" required aria-describedby="raymer-thrust-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-raymer-thrust-weight">?
+                                <span class="tooltip-text" id="tooltip-raymer-thrust-weight" role="tooltip" aria-hidden="true">Total engine thrust divided by takeoff weight</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid ratio</div>
+                        <div class="error-message" id="raymer-thrust-weight-error" role="alert">Please enter a valid ratio</div>
                     </div>
                 </div>
                 
-                <div id="roskam-params" class="tab-content">
+                <div id="roskam-params" class="tab-content" role="tabpanel" aria-labelledby="tab-roskam">
                     <div class="form-group">
                         <label for="roskam-empty-weight">Empty Weight (kg)</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="roskam-empty-weight" value="22000" min="0" step="1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Operational empty weight of the aircraft</span>
+                            <input type="number" id="roskam-empty-weight" value="22000" min="0" step="1" required aria-describedby="roskam-empty-weight-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-roskam-empty-weight">?
+                                <span class="tooltip-text" id="tooltip-roskam-empty-weight" role="tooltip" aria-hidden="true">Operational empty weight of the aircraft</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid weight</div>
+                        <div class="error-message" id="roskam-empty-weight-error" role="alert">Please enter a valid weight</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="roskam-fuel-fraction">Fuel Weight Fraction</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="roskam-fuel-fraction" value="0.3" min="0" max="1" step="0.01" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Fuel weight as fraction of takeoff weight</span>
+                            <input type="number" id="roskam-fuel-fraction" value="0.3" min="0" max="1" step="0.01" required aria-describedby="roskam-fuel-fraction-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-roskam-fuel-fraction">?
+                                <span class="tooltip-text" id="tooltip-roskam-fuel-fraction" role="tooltip" aria-hidden="true">Fuel weight as fraction of takeoff weight</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid fraction (0-1)</div>
+                        <div class="error-message" id="roskam-fuel-fraction-error" role="alert">Please enter a valid fraction (0-1)</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="roskam-load-factor">Load Factor</label>
                         <div class="input-with-tooltip">
-                            <input type="number" id="roskam-load-factor" value="1.5" min="1" step="0.1" required>
-                            <div class="tooltip">?
-                                <span class="tooltip-text">Design load factor (n)</span>
+                            <input type="number" id="roskam-load-factor" value="1.5" min="1" step="0.1" required aria-describedby="roskam-load-factor-error">
+                            <div class="tooltip" tabindex="0" aria-describedby="tooltip-roskam-load-factor">?
+                                <span class="tooltip-text" id="tooltip-roskam-load-factor" role="tooltip" aria-hidden="true">Design load factor (n)</span>
                             </div>
                         </div>
-                        <div class="error-message">Please enter a valid factor (≥1)</div>
+                        <div class="error-message" id="roskam-load-factor-error" role="alert">Please enter a valid factor (≥1)</div>
                     </div>
                 </div>
                 
                 <button id="calculate-btn">Calculate MTOW</button>
-            </div>
+            </section>
             
-            <div class="output-section">
-                <h2 class="section-title">Results</h2>
+            <section class="output-section" aria-labelledby="output-section-title">
+                <h2 class="section-title" id="output-section-title">Results</h2>
                 
                 <div class="results">
                     <div class="result-card">
@@ -542,11 +557,11 @@
                         <div class="comparison">
                             <div class="method-card">
                                 <div class="method-title">Raymer Method</div>
-                                <div class="method-value" id="raymer-mtow">-</div>
+                                <div class="method-value" id="raymer-mtow" aria-live="polite">-</div>
                             </div>
                             <div class="method-card">
                                 <div class="method-title">Roskam Method</div>
-                                <div class="method-value" id="roskam-mtow">-</div>
+                                <div class="method-value" id="roskam-mtow" aria-live="polite">-</div>
                             </div>
                         </div>
                     </div>
@@ -608,22 +623,29 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // Tab functionality
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                // Remove active class from all tabs and content
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Remove active class and set aria-selected to false for all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                // Hide all tab content panels
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 
-                // Add active class to clicked tab
+                // Add active class and set aria-selected to true for clicked tab
                 tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
                 
-                // Show corresponding content
+                // Show corresponding content panel
                 const tabName = tab.getAttribute('data-tab');
-                document.getElementById(`${tabName}-params`).classList.add('active');
+                const tabPanel = document.getElementById(`${tabName}-params`);
+                tabPanel.classList.add('active');
+                // No need to manage aria-hidden if display is controlled by active class
             });
         });
         
@@ -654,46 +676,133 @@
         
         // Initial calculation
         calculateMTOW();
+
+        // Tooltip functionality (generalized for all tooltips)
+        const allTooltipIcons = document.querySelectorAll('.tooltip');
+        let currentlyOpenTooltipText = null; // Keep track of the open tooltip
+
+        allTooltipIcons.forEach(tooltipIcon => {
+            const tooltipTextId = tooltipIcon.getAttribute('aria-describedby');
+            if (!tooltipTextId) return; // Skip if no aria-describedby
+
+            const tooltipText = document.getElementById(tooltipTextId);
+            if (!tooltipText) return; // Skip if tooltip text not found
+
+            const showTooltip = () => {
+                // Hide any other open tooltip first
+                if (currentlyOpenTooltipText && currentlyOpenTooltipText !== tooltipText) {
+                    currentlyOpenTooltipText.classList.remove('visible');
+                    currentlyOpenTooltipText.setAttribute('aria-hidden', 'true');
+                }
+                tooltipText.classList.add('visible');
+                tooltipText.setAttribute('aria-hidden', 'false');
+                currentlyOpenTooltipText = tooltipText;
+            };
+
+            const hideTooltip = () => {
+                tooltipText.classList.remove('visible');
+                tooltipText.setAttribute('aria-hidden', 'true');
+                if (currentlyOpenTooltipText === tooltipText) {
+                    currentlyOpenTooltipText = null;
+                }
+            };
+
+            const toggleTooltip = (event) => {
+                event.stopPropagation();
+                const isCurrentlyVisible = tooltipText.classList.contains('visible');
+                if (isCurrentlyVisible) {
+                    hideTooltip();
+                } else {
+                    showTooltip();
+                }
+            };
+
+            tooltipIcon.addEventListener('click', toggleTooltip);
+
+            tooltipIcon.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleTooltip(event);
+                } else if (event.key === 'Escape') {
+                    if (tooltipText.classList.contains('visible')) {
+                        hideTooltip();
+                        tooltipIcon.focus(); // Return focus to the icon
+                    }
+                }
+            });
+
+            tooltipIcon.addEventListener('focusout', (event) => {
+                // Delay to allow focus to move to a potential interactive element within tooltip (not applicable here)
+                // or to handle click that moves focus.
+                setTimeout(() => {
+                    // If focus has moved outside the tooltip icon and its text (tooltip text itself is not focusable)
+                    if (document.activeElement !== tooltipIcon && document.activeElement !== tooltipText) {
+                        hideTooltip();
+                    }
+                }, 150); // Adjusted delay for focusout behavior
+            });
+        });
+
+        // Global Escape key listener to close any open tooltip
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && currentlyOpenTooltipText) {
+                const iconToFocus = document.querySelector(`.tooltip[aria-describedby="${currentlyOpenTooltipText.id}"]`);
+                currentlyOpenTooltipText.classList.remove('visible');
+                currentlyOpenTooltipText.setAttribute('aria-hidden', 'true');
+                currentlyOpenTooltipText = null;
+                if (iconToFocus) {
+                    iconToFocus.focus();
+                }
+            }
+        });
         
         // Main calculation function
         function calculateMTOW() {
-            // Get general inputs
+            // Section: Retrieve General Input Parameters
+            // Fetches values from the 'General' tab inputs, providing default values if parsing fails.
             const crewWeight = parseFloat(document.getElementById('crew-weight').value) || 0;
             const payloadWeight = parseFloat(document.getElementById('payload-weight').value) || 0;
             const fuelWeight = parseFloat(document.getElementById('fuel-weight').value) || 0;
-            const wingArea = parseFloat(document.getElementById('wing-area').value) || 1;
-            const aspectRatio = parseFloat(document.getElementById('aspect-ratio').value) || 1;
+            const wingArea = parseFloat(document.getElementById('wing-area').value) || 1; // Default to 1 to avoid division by zero
+            const aspectRatio = parseFloat(document.getElementById('aspect-ratio').value) || 1; // Default to 1
             
-            // Calculate MTOW using Raymer method
+            // Section: Raymer Method Calculation
+            // Fetches Raymer-specific inputs and calculates MTOW.
             const raymerEmptyWeight = parseFloat(document.getElementById('raymer-empty-weight').value) || 0;
-            const raymerWingLoading = parseFloat(document.getElementById('raymer-wing-loading').value) || 500;
-            const raymerThrustWeight = parseFloat(document.getElementById('raymer-thrust-weight').value) || 0.3;
+            const raymerWingLoading = parseFloat(document.getElementById('raymer-wing-loading').value) || 500; // Example default
+            const raymerThrustWeight = parseFloat(document.getElementById('raymer-thrust-weight').value) || 0.3; // Example default
             
-            // Simplified Raymer calculation (actual method would be more complex)
+            // Note: This is a simplified placeholder for Raymer's MTOW calculation.
+            // A real implementation would involve more complex formulas based on these inputs.
             const raymerMTOW = raymerEmptyWeight + crewWeight + payloadWeight + fuelWeight;
-            const raymerWingLoadingCalc = raymerMTOW / wingArea;
+            const raymerWingLoadingCalc = wingArea > 0 ? raymerMTOW / wingArea : 0; // Calculated wing loading
             
-            // Calculate MTOW using Roskam method
+            // Section: Roskam Method Calculation
+            // Fetches Roskam-specific inputs and calculates MTOW.
             const roskamEmptyWeight = parseFloat(document.getElementById('roskam-empty-weight').value) || 0;
-            const roskamFuelFraction = parseFloat(document.getElementById('roskam-fuel-fraction').value) || 0.3;
-            const roskamLoadFactor = parseFloat(document.getElementById('roskam-load-factor').value) || 1.5;
+            const roskamFuelFraction = parseFloat(document.getElementById('roskam-fuel-fraction').value) || 0.3; // Example default
+            const roskamLoadFactor = parseFloat(document.getElementById('roskam-load-factor').value) || 1.5; // Example default
             
-            // Simplified Roskam calculation (actual method would be more complex)
-            const roskamMTOW = (roskamEmptyWeight + crewWeight + payloadWeight) / (1 - roskamFuelFraction);
+            // Note: This is a simplified placeholder for Roskam's MTOW calculation.
+            // It typically involves iterative processes or more detailed component weight buildup.
+            // The formula (Empty + Crew + Payload) / (1 - Fuel Fraction) is a common first estimate.
+            const roskamMTOW = (1 - roskamFuelFraction > 0) ? (roskamEmptyWeight + crewWeight + payloadWeight) / (1 - roskamFuelFraction) : 0;
             
-            // Display results
+            // Section: Display Results
+            // Updates the HTML elements with the calculated MTOW values and details.
             document.getElementById('raymer-mtow').textContent = `${raymerMTOW.toFixed(0)} kg`;
             document.getElementById('roskam-mtow').textContent = `${roskamMTOW.toFixed(0)} kg`;
             
-            // Display details
+            // Update Raymer method details display
             document.getElementById('raymer-empty-detail').textContent = `${raymerEmptyWeight.toFixed(0)} kg`;
             document.getElementById('raymer-payload-detail').textContent = `${(crewWeight + payloadWeight).toFixed(0)} kg`;
             document.getElementById('raymer-fuel-detail').textContent = `${fuelWeight.toFixed(0)} kg`;
             document.getElementById('raymer-wing-loading-detail').textContent = `${raymerWingLoadingCalc.toFixed(1)} kg/m²`;
             
+            // Update Roskam method details display
             document.getElementById('roskam-empty-detail').textContent = `${roskamEmptyWeight.toFixed(0)} kg`;
             document.getElementById('roskam-payload-detail').textContent = `${(crewWeight + payloadWeight).toFixed(0)} kg`;
-            document.getElementById('roskam-fuel-fraction-detail').textContent = `${roskamFuelFraction.toFixed(3)}`;
+            document.getElementById('roskam-fuel-fraction-detail').textContent = `${roskamFuelFraction.toFixed(3)}`; // Higher precision for fraction
             document.getElementById('roskam-load-factor-detail').textContent = `${roskamLoadFactor.toFixed(1)}`;
         }
     </script>
